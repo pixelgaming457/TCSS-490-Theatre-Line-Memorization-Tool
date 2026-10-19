@@ -1,0 +1,940 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>LLL: Line Language Learner</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap">
+<style id="pb-style">
+/* Layout: a playbill band over the house; repertoire list in the wings (left), the parchment stage in the centre with the rehearsal log beneath it. */
+:root {
+  --bg: #e6dcc6;
+  --paper: #f7f0e1;
+  --ink: #2b1e15;
+  --muted: #6f5b48;
+  --rule: #cfbf9f;
+  --bar: #ddcfb2;
+  --accent: #7c1f25;
+  --accent-ink: #fbf3e4;
+  --gold: #94701f;
+  --cue: #5d5141;
+  --good: #3f6b3a;
+  --warn: #9a5a16;
+  --band: #4a1015;
+  --band-2: #2e080b;
+  --band-fg: #f1dfb4;
+  --band-gold: #d8b25c;
+  --shadow: 0 1px 0 rgba(60, 35, 15, .08), 0 10px 30px -18px rgba(60, 30, 10, .45);
+  --display: "IM Fell English", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --caps: "IM Fell English SC", "IM Fell English", Georgia, serif;
+  --text: "EB Garamond", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #140e0c; --paper: #1f1714; --ink: #efe3cb; --muted: #ab9880; --rule: #3b2d25; --bar: #3a2d25;
+    --accent: #d86f72; --accent-ink: #1a0f0d; --gold: #d6ae5c; --cue: #b9a78d; --good: #8dbb83; --warn: #e0a35a;
+    --band: #3d0c11; --band-2: #1c0507; --band-fg: #f1dfb4; --band-gold: #d8b25c;
+    --shadow: 0 1px 0 rgba(0,0,0,.4), 0 14px 34px -20px rgba(0,0,0,.9);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #140e0c; --paper: #1f1714; --ink: #efe3cb; --muted: #ab9880; --rule: #3b2d25; --bar: #3a2d25;
+  --accent: #d86f72; --accent-ink: #1a0f0d; --gold: #d6ae5c; --cue: #b9a78d; --good: #8dbb83; --warn: #e0a35a;
+  --band: #3d0c11; --band-2: #1c0507; --band-fg: #f1dfb4; --band-gold: #d8b25c;
+  --shadow: 0 1px 0 rgba(0,0,0,.4), 0 14px 34px -20px rgba(0,0,0,.9);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--text); font-size: 17px; line-height: 1.5; }
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: 3px; }
+
+.band {
+  background: radial-gradient(120% 140% at 50% 0%, var(--band) 0%, var(--band-2) 100%);
+  color: var(--band-fg);
+  border-bottom: 3px double var(--band-gold);
+}
+.band-inner, .wrap {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.band-inner { padding-block: 22px 18px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 10px 24px; }
+.brand { display: grid; gap: 2px; }
+.brand h1 { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1; letter-spacing: .01em; text-wrap: balance; }
+.brand h1 .orn { color: var(--band-gold); font-size: .7em; vertical-align: .12em; margin-right: .2em; }
+.brand p { margin: 0; font-style: italic; opacity: .85; }
+.brand-edit { display: grid; gap: 8px; flex: 1 1 420px; min-width: 0; max-width: 640px; }
+.brand-edit input { background: color-mix(in srgb, var(--band-2) 60%, transparent); color: var(--band-fg); border: 1px solid color-mix(in srgb, var(--band-gold) 45%, transparent); }
+#h-title { font-family: var(--display); font-size: 1.8rem; line-height: 1.1; padding: 4px 10px; }
+#h-tag { font-style: italic; }
+.band-btn { background: none; color: var(--band-fg); border-color: color-mix(in srgb, var(--band-gold) 50%, transparent); }
+.band-btn:hover { border-color: var(--band-gold); }
+.h-help { margin: 0; font-size: .88rem; font-style: italic; opacity: .8; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.store-chip { font-family: var(--caps); font-size: .85rem; letter-spacing: .06em; color: var(--band-gold); border: 1px solid color-mix(in srgb, var(--band-gold) 50%, transparent); border-radius: 999px; padding: 3px 12px; white-space: nowrap; }
+
+.wrap { padding-block: 24px 48px; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 28px; align-items: start; }
+@media (max-width: 860px) { .wrap { grid-template-columns: minmax(0, 1fr); gap: 18px; } }
+
+.label { font-family: var(--caps); letter-spacing: .08em; font-size: .9rem; color: var(--muted); margin: 0; }
+
+/* Repertoire */
+.wings { display: grid; gap: 10px; min-width: 0; }
+.wings-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-bottom: 1px solid var(--rule); padding-bottom: 6px; }
+.rep { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rep button { width: 100%; text-align: left; background: none; border: 0; border-left: 3px solid transparent; padding: 8px 10px; cursor: pointer; display: grid; gap: 1px; border-radius: 0 4px 4px 0; }
+.rep button:hover { background: color-mix(in srgb, var(--paper) 70%, transparent); }
+.rep button[aria-current="true"] { border-left-color: var(--accent); background: var(--paper); }
+.rep .t { font-weight: 600; line-height: 1.25; overflow-wrap: anywhere; }
+.rep .s { font-size: .88rem; color: var(--muted); font-style: italic; overflow-wrap: anywhere; }
+.rep .m { font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.tag { font-family: var(--caps); font-size: .72rem; letter-spacing: .08em; color: var(--gold); border: 1px solid currentColor; border-radius: 3px; padding: 0 5px; margin-left: 6px; vertical-align: .1em; font-style: normal; }
+@media (max-width: 860px) {
+  .rep { grid-auto-flow: column; grid-auto-columns: minmax(200px, 70%); overflow-x: auto; padding-bottom: 4px; scroll-snap-type: x mandatory; }
+  .rep li { scroll-snap-align: start; }
+}
+
+/* Buttons */
+.btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--rule); background: var(--paper); border-radius: 4px; padding: 6px 12px; cursor: pointer; line-height: 1.2; }
+.btn:hover { border-color: var(--gold); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.primary:hover { filter: brightness(1.08); }
+.btn.ghost { background: none; border-color: transparent; color: var(--muted); }
+.btn.ghost:hover { color: var(--ink); border-color: var(--rule); }
+.btn.danger { color: var(--accent); }
+.btn.danger.armed { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.btn:disabled { opacity: .45; cursor: default; filter: none; }
+kbd { font-family: var(--text); font-size: .75rem; border: 1px solid currentColor; border-radius: 3px; padding: 0 4px; opacity: .7; }
+@media (max-width: 600px) { kbd { display: none; } }
+
+/* Main */
+.main { display: grid; gap: 22px; min-width: 0; }
+.piece-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px 16px; }
+.piece-head h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(1.6rem, 3.6vw, 2.1rem); line-height: 1.1; text-wrap: balance; overflow-wrap: anywhere; }
+.piece-head .sub { margin: 4px 0 0; color: var(--muted); font-style: italic; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; background: var(--paper); }
+.seg button { border: 0; background: none; padding: 6px 12px; cursor: pointer; font-family: var(--caps); letter-spacing: .05em; font-size: .9rem; color: var(--muted); }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+
+/* Stage (the parchment) */
+.stage { background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; box-shadow: var(--shadow); min-width: 0; }
+.stage-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 18px; border-bottom: 1px solid var(--rule); }
+.progress { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .95rem; display: flex; gap: 14px; flex-wrap: wrap; }
+.progress b { color: var(--ink); font-weight: 600; }
+.script { padding: 18px 18px 24px 0; font-size: 1.28rem; line-height: 1.75; }
+.ln { display: grid; grid-template-columns: 3.2rem minmax(0, 1fr); align-items: baseline; }
+.ln .num { text-align: right; padding-right: 1rem; font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; font-style: italic; user-select: none; }
+.ln .txt { overflow-wrap: anywhere; padding: 1px 8px; border-radius: 3px; position: relative; }
+.ln.mine .txt { cursor: pointer; }
+.ln.mine .txt:hover { background: color-mix(in srgb, var(--bar) 35%, transparent); }
+.ln.current .txt { background: color-mix(in srgb, var(--gold) 16%, transparent); box-shadow: inset 3px 0 0 var(--gold); }
+.ln.clean .txt { color: var(--ink); }
+.ln.prompted .txt { text-decoration: underline wavy color-mix(in srgb, var(--warn) 60%, transparent); text-decoration-thickness: 1px; text-underline-offset: 5px; }
+.ln.cue .txt { color: var(--cue); font-style: italic; font-size: .92em; }
+.ln.dir .txt { color: var(--muted); font-style: italic; font-size: .88em; }
+.ln.speaker .txt { font-family: var(--caps); letter-spacing: .1em; font-size: .78em; color: var(--accent); padding-top: .6em; }
+.ln.speaker.theirs .txt { color: var(--muted); }
+.gap { height: .7em; }
+.hid { color: transparent; background: var(--bar); border-radius: 2px; user-select: none; -webkit-user-select: none; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
+.mark { position: absolute; right: -1.6rem; top: 0; font-size: .85rem; }
+.mark.ok { color: var(--good); }
+.mark.pr { color: var(--warn); }
+.ln .txt { margin-right: 1.8rem; }
+@media (max-width: 600px) {
+  .script { font-size: 1.12rem; padding-right: 0; }
+  .ln { grid-template-columns: 2.2rem minmax(0, 1fr); }
+  .ln .num { padding-right: .5rem; }
+}
+
+.controls {
+  position: sticky; bottom: 0; z-index: 5;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between;
+  padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid var(--rule); border-radius: 0 0 6px 6px;
+}
+.controls .big { font-size: 1.05rem; padding: 9px 16px; }
+.controls .line-call { font-family: var(--display); font-style: italic; font-size: 1.15rem; }
+
+.notice { margin: 12px 18px 0; padding: 8px 12px; border-left: 3px solid var(--warn); background: color-mix(in srgb, var(--warn) 10%, transparent); font-size: .95rem; }
+
+/* Curtain call / notes */
+.curtain { padding: 20px 18px 22px; border-top: 3px double var(--rule); display: grid; gap: 12px; }
+.curtain h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 1.5rem; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; font-variant-numeric: tabular-nums; }
+.stats div { display: grid; }
+.stats .v { font-family: var(--display); font-size: 1.7rem; line-height: 1.1; }
+.stats .k { font-size: .85rem; color: var(--muted); }
+textarea, input[type="text"] { width: 100%; background: var(--bg); border: 1px solid var(--rule); border-radius: 4px; padding: 8px 10px; }
+textarea { resize: vertical; line-height: 1.5; }
+textarea:focus, input:focus { outline: 2px solid var(--gold); outline-offset: 0; border-color: transparent; }
+
+/* Log */
+.log { display: grid; gap: 10px; }
+.log-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; border-bottom: 1px solid var(--rule); padding-bottom: 6px; }
+.log-head h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 1.45rem; }
+.entries { list-style: none; margin: 0; padding: 0; display: grid; }
+.entry { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 4px 16px; padding: 12px 0; border-bottom: 1px dotted var(--rule); }
+.entry .when { font-variant-numeric: tabular-nums; color: var(--muted); font-size: .9rem; line-height: 1.35; }
+.entry .when b { display: block; color: var(--ink); font-weight: 600; font-size: 1rem; }
+.entry .body { display: grid; gap: 4px; min-width: 0; }
+.entry .meta { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.entry .note { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.entry .note.empty { color: var(--muted); font-style: italic; }
+.entry .trouble { margin: 0; font-size: .92rem; color: var(--muted); }
+.entry .trouble q { font-style: italic; color: var(--ink); }
+.entry .del { justify-self: start; font-size: .82rem; padding: 2px 8px; }
+.meter { display: inline-block; width: 64px; height: 6px; background: var(--bar); border-radius: 3px; vertical-align: middle; overflow: hidden; margin-right: 6px; }
+.meter i { display: block; height: 100%; background: var(--good); }
+@media (max-width: 600px) { .entry { grid-template-columns: minmax(0, 1fr); } }
+.empty-log { color: var(--muted); font-style: italic; margin: 6px 0; }
+
+/* Editor */
+.editor { background: var(--paper); border: 1px solid var(--rule); border-radius: 6px; box-shadow: var(--shadow); padding: 20px 18px; display: grid; gap: 14px; }
+.editor h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 1.8rem; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.field { display: grid; gap: 4px; min-width: 0; }
+.field label { font-family: var(--caps); letter-spacing: .06em; font-size: .9rem; color: var(--muted); }
+.field .hint { font-size: .88rem; color: var(--muted); margin: 0; }
+#f-text { min-height: 320px; font-size: 1.05rem; }
+.howto { font-size: .92rem; color: var(--muted); border-left: 2px solid var(--rule); padding-left: 12px; margin: 0; }
+.howto code { font-family: var(--text); font-style: italic; color: var(--ink); }
+.err { color: var(--accent); margin: 0; font-size: .95rem; }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--ink); color: var(--paper); padding: 8px 16px; border-radius: 4px; z-index: 50; font-size: .95rem; max-width: calc(100% - 32px); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ln .txt { transition: background-color .2s ease; }
+  .curtain { animation: rise .35s ease-out; }
+  @keyframes rise { from { transform: translateY(6px); opacity: .6; } to { transform: none; opacity: 1; } }
+}
+</style>
+
+<header class="band">
+  <div class="band-inner">
+    <div class="brand" id="brand">
+      <h1><span class="orn" aria-hidden="true">❦</span><span id="site-title">LLL: Line Language Learner</span></h1>
+      <p id="site-tag">Need some help with line-memorization? Last-minute audition prep? Rehearse your monologues and scenes one line at a time with LLL.</p>
+    </div>
+    <form class="brand-edit" id="brand-edit" hidden="">
+      <label class="sr" for="h-title">Site title</label>
+      <input type="text" id="h-title" maxlength="80">
+      <label class="sr" for="h-tag">Description</label>
+      <input type="text" id="h-tag" maxlength="200">
+      <div class="row">
+        <button class="btn primary" type="submit" id="h-publish">Publish for everyone</button>
+        <button class="btn band-btn" type="button" id="h-cancel">Cancel</button>
+        <button class="btn band-btn" type="button" id="h-reset">Revert to published</button>
+      </div>
+      <p class="h-help">Publishing saves a new version of the page with this title and description built in, including the browser-tab title. Everyone with the link sees it.</p>
+    </form>
+    <div class="row">
+      <button class="btn band-btn" type="button" id="edit-heading" hidden="">Edit features</button>
+      <span class="store-chip" id="store-chip">Saved in this browser</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="wings" aria-label="Repertoire">
+    <div class="wings-head">
+      <p class="label">Repertoire</p>
+      <button class="btn" id="new-piece" type="button">+ New piece</button>
+    </div>
+    <ul class="rep" id="rep"></ul>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+
+<div class="toast" id="toast" role="status" hidden=""></div>
+
+<script type="application/json" id="pb-config">{"title":"LLL: Line Language Learner","tagline":"Need some help with line-memorization? Last-minute audition prep? Rehearse your monologues and scenes one line at a time with LLL."}</script>
+<script id="pb-script">
+(() => {
+  // Pristine copies of the page's own parts, taken before anything renders, so "Publish for everyone" can rebuild the page source.
+  const SRC = {
+    style: document.getElementById("pb-style").textContent,
+    header: document.querySelector("header.band").outerHTML,
+    wrap: document.querySelector(".wrap").outerHTML,
+    toast: document.getElementById("toast").outerHTML,
+    script: document.getElementById("pb-script").textContent,
+    reset: ":root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}"
+  };
+  const LOCAL_KEY = "promptbook.pieces.v1";
+  const MODE_KEY = "promptbook.mode";
+  const MODES = [["full", "Full text"], ["letters", "First letters"], ["blank", "Blank"]];
+
+  const SAMPLE = {
+    id: "example",
+    example: true,
+    title: "How happy some o'er other some can be",
+    source: "A Midsummer Night's Dream, I.i",
+    character: "Helena",
+    text: `LYSANDER: Helena, adieu:
+As you on him, Demetrius dote on you!
+[Exit LYSANDER]
+
+HELENA: How happy some o'er other some can be!
+Through Athens I am thought as fair as she.
+But what of that? Demetrius thinks not so;
+He will not know what all but he do know:
+And as he errs, doting on Hermia's eyes,
+So I, admiring of his qualities:
+Things base and vile, holding no quantity,
+Love can transpose to form and dignity:
+Love looks not with the eyes, but with the mind;
+And therefore is wing'd Cupid painted blind:
+Nor hath Love's mind of any judgement taste;
+Wings and no eyes figure unheedy haste:
+And therefore is Love said to be a child,
+Because in choice he is so oft beguiled.
+As waggish boys in game themselves forswear,
+So the boy Love is perjured every where:
+For ere Demetrius look'd on Hermia's eyne,
+He hail'd down oaths that he was only mine;
+And when this hail some heat from Hermia felt,
+So he dissolved, and showers of oaths did melt.
+I will go tell him of fair Hermia's flight:
+Then to the wood will he to-morrow night
+Pursue her; and for this intelligence
+If I have thanks, it is a dear expense:
+But herein mean I to enrich my pain,
+To have his sight thither and back again.
+[Exit]`,
+    created: 0, updated: 0, sessions: []
+  };
+
+  // ---------- storage ----------
+  let pieces = loadLocal();
+  let cloud = null;          // collection ref when synced to the account
+  const writeChains = {};
+
+  function loadLocal() {
+    try { const v = JSON.parse(localStorage.getItem(LOCAL_KEY)); return Array.isArray(v) ? v : []; } catch { return []; }
+  }
+  function saveLocal() {
+    try { localStorage.setItem(LOCAL_KEY, JSON.stringify(pieces)); } catch {}
+  }
+  function persist(p) {
+    const copy = JSON.parse(JSON.stringify(p));
+    const i = pieces.findIndex(x => x.id === p.id);
+    if (i >= 0) pieces[i] = copy; else pieces.push(copy);
+    if (cloud) {
+      writeChains[p.id] = (writeChains[p.id] || Promise.resolve())
+        .then(() => cloud.doc(p.id).set(copy))
+        .catch(e => toast(e && e.code === "quota_exceeded" ? "Storage is full. Delete an old piece to make room." : "That change didn't save. Check your connection and try again."));
+    } else saveLocal();
+  }
+  function removePiece(id) {
+    pieces = pieces.filter(p => p.id !== id);
+    if (cloud) {
+      writeChains[id] = (writeChains[id] || Promise.resolve())
+        .then(() => cloud.doc(id).delete())
+        .catch(() => toast("That piece couldn't be deleted. Try again."));
+    } else saveLocal();
+  }
+
+  // ---------- site heading (owner-editable, shown to every viewer) ----------
+  // The published title and description live in the #pb-config block; publishing rewrites it into a new page version.
+  const CONFIG = (() => { try { return JSON.parse(document.getElementById("pb-config").textContent); } catch { return {}; } })();
+  const heading = { title: CONFIG.title || "LLL: Line Language Learner", tagline: CONFIG.tagline || "" };
+  let canEditHeading = true;      // narrowed once the viewer is known
+  let artifactCap = null;
+  let publishing = false;
+
+  function applyHeading() {
+    $("#site-title").textContent = heading.title;
+    $("#site-tag").textContent = heading.tagline;
+    $("#site-tag").hidden = !heading.tagline;
+    document.title = heading.title;
+  }
+  function pageSource(next) {
+    const tpl = document.createElement("template");
+    tpl.innerHTML = SRC.header;
+    tpl.content.querySelector("#site-title").textContent = next.title;
+    const tag = tpl.content.querySelector("#site-tag");
+    tag.textContent = next.tagline;
+    tag.hidden = !next.tagline;
+    const header = tpl.innerHTML;
+    const S = "script";
+    const json = JSON.stringify(next).replace(/</g, "\\u003c");
+    return "<!doctype html><html><head><meta charset=utf8><meta name=viewport content=\"width=device-width,initial-scale=1,viewport-fit=cover\"><style>" + SRC.reset + "</style></head><body>"
+      + "<title>" + esc(next.title) + "</title>\n"
+      + "<meta name=\"claude:viewport-fit-sides\" content=\"cover\">\n"
+      + "<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n"
+      + "<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n"
+      + "<link rel=\"stylesheet\" href=\"https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap\">\n"
+      + "<style id=\"pb-style\">" + SRC.style + "</style>\n\n"
+      + header + "\n\n" + SRC.wrap + "\n\n" + SRC.toast + "\n\n"
+      + "<" + S + " type=\"application/json\" id=\"pb-config\">" + json + "</" + S + ">\n"
+      + "<" + S + " id=\"pb-script\">" + SRC.script + "</" + S + ">\n"
+      + "</body></html>";
+  }
+  async function publishHeading(next) {
+    if (publishing) return;
+    if (!artifactCap) { toast("Publishing isn't available in this view. Open the page on claude.ai while signed in as its owner."); return; }
+    publishing = true;
+    const btn = $("#h-publish"); btn.disabled = true; btn.textContent = "Publishing…";
+    try {
+      try { sessionStorage.setItem("promptbook.flash", "Published. Everyone now sees the new heading."); } catch {}
+      await artifactCap.publish(pageSource(next));
+    } catch (e) {
+      try { sessionStorage.removeItem("promptbook.flash"); } catch {}
+      const code = e && e.code;
+      if (code === "conflict") return;   // a newer version exists; the page is reloading to it
+      if (code === "not_writer" || code === "not_granted" || code === "not_declared" || code === "consent_required" || code === "capability_disabled") {
+        canEditHeading = false; devMode = false; closeHeadingEditor();
+        toast("This view is read-only, so the heading can't be published from here.");
+      } else if (code === "rate_limited") toast("Too many publishes in a row. Wait a minute and try again.");
+      else toast("Publishing failed. Your changes are still in the form; try again.");
+    } finally {
+      publishing = false; btn.disabled = false; btn.textContent = "Publish for everyone";
+    }
+  }
+  function openHeadingEditor() {
+    $("#h-title").value = heading.title;
+    $("#h-tag").value = heading.tagline;
+    $("#brand").hidden = true; $("#brand-edit").hidden = false; $("#edit-heading").hidden = true;
+    $("#h-title").focus();
+  }
+  function closeHeadingEditor() {
+    $("#brand").hidden = false; $("#brand-edit").hidden = true;
+    $("#edit-heading").hidden = !devMode;
+  }
+  let devMode = false, typed = "";
+  function toggleDevMode() {
+    devMode = !devMode;
+    if (!devMode && !$("#brand-edit").hidden) closeHeadingEditor();
+    $("#edit-heading").hidden = !devMode;
+    toast(devMode ? "Edit features on. Type “theatre” again to hide it." : "Edit features hidden.");
+  }
+
+  async function connect() {
+    if (!window.claude || !window.claude.use) return;
+    try {
+      const [db, user, art] = await Promise.all([claude.use("db"), claude.use("user"), claude.use("artifact")]);
+      artifactCap = art;
+      if (user) canEditHeading = await user.canEdit();
+      if (!db || !user) return;
+      const uid = await user.id();
+      if (!uid) return;
+      const col = db.collection("data/users/" + uid);
+      let first = true;
+      col.onSnapshot(snap => {
+        cloud = col;
+        $("#store-chip").textContent = "Saved to your account";
+        const remote = snap.docs.map(d => JSON.parse(JSON.stringify(d.data())));
+        if (first) {
+          first = false;
+          const local = loadLocal();
+          if (snap.empty && local.length) { local.forEach(persist); render(); return; }
+        }
+        pieces = remote;
+        render();
+      }, () => {
+        cloud = null;
+        $("#store-chip").textContent = "Saved in this browser";
+      });
+    } catch {}
+  }
+
+  // ---------- helpers ----------
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const newId = () => "p" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  let toastTimer;
+  function toast(msg) {
+    const t = $("#toast"); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 3200);
+  }
+  function fmtDate(ts) {
+    const d = new Date(ts);
+    return {
+      day: d.toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" }),
+      time: d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }),
+      year: d.getFullYear() !== new Date().getFullYear() ? String(d.getFullYear()) : ""
+    };
+  }
+  function relDay(ts) {
+    const days = Math.floor((startOfDay(Date.now()) - startOfDay(ts)) / 864e5);
+    if (days <= 0) return "today";
+    if (days === 1) return "yesterday";
+    if (days < 7) return days + " days ago";
+    return new Date(ts).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+  }
+  function startOfDay(ts) { const d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime(); }
+  function readMode() { try { const m = localStorage.getItem(MODE_KEY); return MODES.some(x => x[0] === m) ? m : "letters"; } catch { return "letters"; } }
+
+  // ---------- script parsing ----------
+  // Lines prefixed "NAME:" (or a NAME alone on a line) set the speaker; lines in [brackets] or (parens) are stage directions.
+  function parse(piece) {
+    const me = (piece.character || "").trim().toUpperCase().replace(/\s+/g, " ");
+    const rows = [];
+    let speaker = null, anySpeaker = false;
+    for (const raw of String(piece.text || "").split(/\r?\n/)) {
+      const line = raw.trim();
+      if (!line) { if (rows.length && rows[rows.length - 1].kind !== "gap") rows.push({ kind: "gap" }); continue; }
+      if (/^[\[(].*[\])]$/.test(line)) { rows.push({ kind: "dir", text: line }); continue; }
+      const alone = line.match(/^([A-Z][A-Z0-9 .'\-]*[A-Z0-9])\.?$/);
+      if (alone && alone[1].length >= 2 && alone[1].length <= 30 && /[A-Z]{2}/.test(alone[1])) {
+        speaker = alone[1].replace(/\s+/g, " "); anySpeaker = true;
+        rows.push({ kind: "speaker", name: speaker }); continue;
+      }
+      const m = line.match(/^([A-Z][A-Za-z0-9 .'\-]{0,30}?)\s*:\s*(.*)$/);
+      let text = line;
+      if (m && m[1] === m[1].toUpperCase() && /[A-Z]{2}/.test(m[1])) {
+        speaker = m[1].trim().replace(/\s+/g, " "); anySpeaker = true;
+        rows.push({ kind: "speaker", name: speaker });
+        text = m[2];
+        if (!text) continue;
+      }
+      rows.push({ kind: "line", text, speaker });
+    }
+    while (rows.length && rows[rows.length - 1].kind === "gap") rows.pop();
+
+    let mineFound = false;
+    const isMine = sp => !me || !anySpeaker || !sp || sp.toUpperCase() === me;
+    rows.forEach(r => { if (r.kind === "line" && r.speaker && isMine(r.speaker)) mineFound = true; });
+    const fallbackAll = me && anySpeaker && !mineFound;
+    let unit = 0, verse = 0;
+    rows.forEach(r => {
+      if (r.kind === "speaker") r.mine = fallbackAll || isMine(r.name);
+      if (r.kind !== "line") return;
+      r.mine = fallbackAll || isMine(r.speaker);
+      if (r.mine) { r.unit = unit++; r.verse = ++verse; }
+    });
+    return { rows, units: unit, fallbackAll, me };
+  }
+
+  function wordsHtml(text, how, reveal) {
+    let w = 0;
+    return text.split(/(\s+)/).map(p => {
+      if (!p || /^\s+$/.test(p)) return p;
+      const i = w++;
+      if (how === "full" || i < reveal) return esc(p);
+      if (how === "letters") {
+        const m = p.match(/^([^\p{L}\p{N}]*)([\p{L}\p{N}])(.*)$/u);
+        if (!m) return esc(p);
+        const trail = (m[3].match(/[^\p{L}\p{N}]*$/u) || [""])[0];
+        const hidden = m[3].slice(0, m[3].length - trail.length);
+        return esc(m[1] + m[2]) + (hidden ? `<span class="hid" aria-hidden="true">${esc(hidden)}</span>` : "") + esc(trail);
+      }
+      return `<span class="hid" aria-hidden="true">${esc(p)}</span>`;
+    }).join("");
+  }
+  const wordCount = t => t.split(/\s+/).filter(Boolean).length;
+
+  // ---------- app state ----------
+  let activeId = null;
+  let view = "practice";          // practice | edit | new
+  let mode = readMode();
+  let sess = null;                // practice session for the active piece
+  let confirmDel = null;          // id currently armed for deletion
+  let wakeLock = null;
+
+  const listed = () => {
+    const own = pieces.slice().sort((a, b) => (b.updated || 0) - (a.updated || 0));
+    return own.length ? own : [SAMPLE];
+  };
+  const active = () => listed().find(p => p.id === activeId) || listed()[0];
+
+  function freshSession(piece) {
+    const parsed = parse(piece);
+    return {
+      key: piece.id + "\u0000" + piece.text + "\u0000" + (piece.character || ""),
+      parsed,
+      cursor: 0,
+      units: Array.from({ length: parsed.units }, () => ({ reveal: 0, prompted: false, status: "pending", calls: 0 })),
+      started: null,
+      finished: false,
+      wrapping: false
+    };
+  }
+  function ensureSession(piece) {
+    const key = piece.id + "\u0000" + piece.text + "\u0000" + (piece.character || "");
+    if (!sess || sess.key !== key) sess = freshSession(piece);
+  }
+  function tally() {
+    const u = sess.units;
+    return {
+      clean: u.filter(x => x.status === "clean").length,
+      prompted: u.filter(x => x.status === "prompted").length,
+      calls: u.reduce((a, x) => a + x.calls, 0),
+      total: u.length
+    };
+  }
+  function touch() {
+    if (!sess.started) {
+      sess.started = Date.now();
+      try { navigator.wakeLock && navigator.wakeLock.request("screen").then(l => wakeLock = l).catch(() => {}); } catch {}
+    }
+  }
+
+  // ---------- actions ----------
+  function lineCall() {
+    if (sess.finished || sess.wrapping) return;
+    const u = sess.units[sess.cursor]; if (!u) return;
+    touch();
+    const row = sess.parsed.rows.find(r => r.unit === sess.cursor);
+    const n = wordCount(row.text);
+    if (mode === "full" || u.reveal >= n) return;
+    u.reveal++; u.calls++; u.prompted = true;
+    renderStage();
+  }
+  function showLine() {
+    if (sess.finished || sess.wrapping) return;
+    const u = sess.units[sess.cursor]; if (!u) return;
+    touch();
+    const row = sess.parsed.rows.find(r => r.unit === sess.cursor);
+    const n = wordCount(row.text);
+    if (u.reveal < n) { u.calls++; u.prompted = true; u.reveal = n; }
+    renderStage();
+  }
+  function gotIt() {
+    if (sess.finished || sess.wrapping) return;
+    const u = sess.units[sess.cursor]; if (!u) return;
+    touch();
+    u.status = u.prompted ? "prompted" : "clean";
+    sess.cursor++;
+    if (sess.cursor >= sess.units.length) { sess.finished = true; sess.wrapping = true; releaseWake(); }
+    renderStage(true);
+  }
+  function back() {
+    if (sess.wrapping) return;
+    if (sess.cursor === 0) return;
+    sess.finished = false;
+    sess.cursor--;
+    Object.assign(sess.units[sess.cursor], { reveal: 0, prompted: false, status: "pending", calls: 0 });
+    renderStage(true);
+  }
+  function jumpTo(unit) {
+    if (sess.wrapping) return;
+    sess.finished = false;
+    sess.cursor = unit;
+    for (let i = unit; i < sess.units.length; i++) Object.assign(sess.units[i], { reveal: 0, prompted: false, status: "pending", calls: 0 });
+    renderStage(true);
+  }
+  function restart() { sess = freshSession(active()); releaseWake(); renderStage(true); }
+  function endEarly() { sess.wrapping = true; releaseWake(); renderStage(); }
+  function releaseWake() { try { wakeLock && wakeLock.release(); } catch {} wakeLock = null; }
+
+  function saveSession(notes) {
+    let piece = active();
+    const t = tally();
+    const rows = sess.parsed.rows;
+    const trouble = sess.units.map((u, i) => u.status === "prompted" ? rows.find(r => r.unit === i).text : null).filter(Boolean);
+    const entry = {
+      at: Date.now(),
+      started: sess.started || Date.now(),
+      mode,
+      total: t.total,
+      attempted: t.clean + t.prompted,
+      clean: t.clean,
+      prompted: t.prompted,
+      calls: t.calls,
+      trouble: trouble.slice(0, 12),
+      notes: notes.trim()
+    };
+    if (piece.example) {
+      piece = { ...JSON.parse(JSON.stringify(SAMPLE)), id: newId(), example: undefined, created: Date.now() };
+      delete piece.example;
+      activeId = piece.id;
+    } else piece = JSON.parse(JSON.stringify(piece));
+    piece.sessions = [entry, ...(piece.sessions || [])].slice(0, 200);
+    piece.updated = Date.now();
+    persist(piece);
+    sess = freshSession(piece);
+    toast("Session added to the rehearsal log.");
+    render();
+  }
+
+  // ---------- render ----------
+  function render() {
+    const list = listed();
+    if (!list.some(p => p.id === activeId) && view !== "new") activeId = list[0].id;
+    renderRep(list);
+    if (view === "edit" || view === "new") renderEditor();
+    else renderPractice();
+  }
+
+  function renderRep(list) {
+    $("#rep").innerHTML = list.map(p => {
+      const last = (p.sessions || [])[0];
+      const meta = last ? `Last run ${relDay(last.at)} · ${last.clean}/${last.total} clean` : "Not yet rehearsed";
+      const sub = [p.source, p.character].filter(Boolean).join(" · ");
+      return `<li><button type="button" data-id="${esc(p.id)}" aria-current="${p.id === activeId && view !== "new"}">
+        <span class="t">${esc(p.title || "Untitled")}${p.example ? '<span class="tag">Example</span>' : ""}</span>
+        ${sub ? `<span class="s">${esc(sub)}</span>` : ""}
+        <span class="m">${esc(meta)}</span></button></li>`;
+    }).join("");
+  }
+
+  function renderPractice() {
+    const p = active();
+    ensureSession(p);
+    const sub = [p.source, p.character && ("as " + p.character)].filter(Boolean).join(" — ");
+    $("#main").innerHTML = `
+      <div class="piece-head">
+        <div style="min-width:0">
+          <h2>${esc(p.title || "Untitled")}</h2>
+          ${sub ? `<p class="sub">${esc(sub)}</p>` : ""}
+        </div>
+        <div class="row">
+          ${p.example
+            ? `<button class="btn" type="button" id="dup">Keep in my repertoire</button>`
+            : `<button class="btn" type="button" id="edit">Edit text</button>
+               <button class="btn danger${confirmDel === p.id ? " armed" : ""}" type="button" id="del">${confirmDel === p.id ? "Delete piece and its log?" : "Delete"}</button>`}
+        </div>
+      </div>
+      <section class="stage" aria-label="Rehearsal">
+        <div class="stage-top">
+          <div class="seg" role="group" aria-label="How much text to show">
+            ${MODES.map(([k, l]) => `<button type="button" data-mode="${k}" aria-pressed="${mode === k}">${l}</button>`).join("")}
+          </div>
+          <div class="progress" id="progress"></div>
+        </div>
+        <div id="stage-body"></div>
+      </section>
+      <section class="log" aria-label="Rehearsal log" id="log"></section>`;
+    renderStage();
+    renderLog(p);
+  }
+
+  function renderStage(scroll) {
+    const body = $("#stage-body"); if (!body) return;
+    const { rows, units, fallbackAll, me } = sess.parsed;
+    const t = tally();
+    $("#progress").innerHTML = units
+      ? `<span>Line <b>${Math.min(sess.cursor + 1, units)}</b> of ${units}</span><span><b>${t.clean}</b> clean</span><span><b>${t.calls}</b> ${t.calls === 1 ? "call" : "calls"} for line</span>`
+      : "";
+    if (!units) {
+      body.innerHTML = `<p class="notice">There are no lines to rehearse yet. Use <b>Edit text</b> to add your piece.</p><div style="height:16px"></div>`;
+      return;
+    }
+    const script = rows.map(r => {
+      if (r.kind === "gap") return `<div class="gap"></div>`;
+      if (r.kind === "dir") return `<div class="ln dir"><span class="num"></span><span class="txt">${esc(r.text)}</span></div>`;
+      if (r.kind === "speaker") return `<div class="ln speaker ${r.mine ? "" : "theirs"}"><span class="num"></span><span class="txt">${esc(r.name)}</span></div>`;
+      if (!r.mine) return `<div class="ln cue"><span class="num"></span><span class="txt">${esc(r.text)}</span></div>`;
+      const u = sess.units[r.unit];
+      const cur = r.unit === sess.cursor && !sess.finished;
+      const done = u.status !== "pending";
+      const how = done ? "full" : mode;
+      const cls = ["ln", "mine", cur && "current", done && u.status].filter(Boolean).join(" ");
+      const mark = u.status === "clean" ? `<span class="mark ok" title="Delivered clean">✓</span>` : u.status === "prompted" ? `<span class="mark pr" title="Needed a prompt">◦</span>` : "";
+      const num = r.verse % 5 === 0 ? r.verse : "";
+      return `<div class="${cls}" data-unit="${r.unit}"${cur ? ' id="cur"' : ""}><span class="num">${num}</span><span class="txt">${wordsHtml(r.text, how, cur ? u.reveal : 0)}${mark}</span></div>`;
+    }).join("");
+
+    const notice = fallbackAll ? `<p class="notice">No lines are marked for ${esc(me)}, so every line is yours to learn. Check the character name under <b>Edit text</b>.</p>` : "";
+    const atEnd = sess.finished;
+    const controls = sess.wrapping ? "" : `
+      <div class="controls">
+        <div class="row">
+          <button class="btn ghost" type="button" id="back" ${sess.cursor === 0 ? "disabled" : ""} title="Go back one line">← Back</button>
+          <button class="btn ghost" type="button" id="restart">Restart</button>
+          ${sess.started ? `<button class="btn ghost" type="button" id="end">End &amp; log</button>` : ""}
+        </div>
+        <div class="row">
+          <button class="btn big line-call" type="button" id="call" ${atEnd || mode === "full" ? "disabled" : ""} title="Reveal the next word">Line! <kbd>L</kbd></button>
+          <button class="btn big" type="button" id="show" ${atEnd ? "disabled" : ""}>Show line <kbd>S</kbd></button>
+          <button class="btn big primary" type="button" id="got" ${atEnd ? "disabled" : ""}>Got it <kbd>Space</kbd></button>
+        </div>
+      </div>`;
+
+    let curtain = "";
+    if (sess.wrapping) {
+      const att = t.clean + t.prompted;
+      curtain = `
+        <div class="curtain">
+          <h3>${sess.finished ? "Curtain." : "Scene stopped."}</h3>
+          <div class="stats">
+            <div><span class="v">${t.clean}/${att || 0}</span><span class="k">lines delivered clean</span></div>
+            <div><span class="v">${t.calls}</span><span class="k">calls for line</span></div>
+            <div><span class="v">${MODES.find(m => m[0] === mode)[1]}</span><span class="k">practice mode</span></div>
+            ${att < t.total ? `<div><span class="v">${att}/${t.total}</span><span class="k">lines reached</span></div>` : ""}
+          </div>
+          <div class="field">
+            <label for="notes">Rehearsal notes</label>
+            <textarea id="notes" rows="4" placeholder="What did you work on? Which beats felt shaky? What will you try next time?"></textarea>
+          </div>
+          <div class="row">
+            <button class="btn primary" type="button" id="save-notes">Save to log</button>
+            <button class="btn" type="button" id="again">Discard and run again</button>
+          </div>
+        </div>`;
+    }
+    body.innerHTML = notice + `<div class="script" id="script">${script}</div>` + controls + curtain;
+    if (sess.wrapping) { const n = $("#notes"); n && n.focus({ preventScroll: false }); }
+    else if (scroll) {
+      const c = $("#cur");
+      if (c) {
+        const r = c.getBoundingClientRect();
+        if (r.top < 80 || r.bottom > innerHeight - 120) c.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      }
+    }
+  }
+
+  function renderLog(p) {
+    const s = p.sessions || [];
+    const totalCalls = s.reduce((a, x) => a + (x.calls || 0), 0);
+    $("#log").innerHTML = `
+      <div class="log-head">
+        <h3>Rehearsal log</h3>
+        <span class="label">${s.length ? `${s.length} ${s.length === 1 ? "session" : "sessions"} · ${totalCalls} calls for line` : ""}</span>
+      </div>
+      ${s.length ? `<ul class="entries">${s.map((e, i) => {
+        const d = fmtDate(e.at);
+        const pct = e.attempted ? Math.round(100 * e.clean / e.attempted) : 0;
+        const mins = Math.max(1, Math.round((e.at - (e.started || e.at)) / 60000));
+        const modeName = (MODES.find(m => m[0] === e.mode) || [, e.mode])[1];
+        const key = p.id + ":" + e.at;
+        return `<li class="entry">
+          <div class="when"><b>${esc(d.day)}</b>${esc(d.time)}${d.year ? " " + d.year : ""}</div>
+          <div class="body">
+            <div class="meta">
+              <span><span class="meter" aria-hidden="true"><i style="width:${pct}%"></i></span>${e.clean}/${e.attempted} clean${e.attempted < e.total ? ` (reached ${e.attempted} of ${e.total})` : ""}</span>
+              <span>${e.calls} ${e.calls === 1 ? "call" : "calls"} for line</span>
+              <span>${esc(modeName)}</span>
+              <span>${mins} min</span>
+            </div>
+            <p class="note${e.notes ? "" : " empty"}">${e.notes ? esc(e.notes) : "No notes for this session."}</p>
+            ${e.trouble && e.trouble.length ? `<p class="trouble">Needed a prompt: ${e.trouble.slice(0, 4).map(x => `<q>${esc(x)}</q>`).join("; ")}${e.trouble.length > 4 ? ` and ${e.trouble.length - 4} more` : ""}</p>` : ""}
+            ${p.example ? "" : `<button class="btn ghost del${confirmDel === key ? " danger armed" : ""}" type="button" data-del-entry="${i}" data-key="${esc(key)}">${confirmDel === key ? "Delete this entry?" : "Delete entry"}</button>`}
+          </div>
+        </li>`;
+      }).join("")}</ul>`
+      : `<p class="empty-log">No sessions logged yet. Run through the piece, then save a note about what you worked on. Entries appear here newest first.</p>`}`;
+  }
+
+  function renderEditor() {
+    const isNew = view === "new";
+    const p = isNew ? { title: "", source: "", character: "", text: "" } : active();
+    $("#main").innerHTML = `
+      <form class="editor" id="editor" novalidate>
+        <h2>${isNew ? "Add a piece" : "Edit piece"}</h2>
+        <div class="fields">
+          <div class="field"><label for="f-title">Title</label><input type="text" id="f-title" value="${esc(p.title)}" placeholder="e.g. The quality of mercy"></div>
+          <div class="field"><label for="f-source">Play &amp; scene</label><input type="text" id="f-source" value="${esc(p.source || "")}" placeholder="e.g. The Merchant of Venice, IV.i"></div>
+          <div class="field"><label for="f-char">Your character</label><input type="text" id="f-char" value="${esc(p.character || "")}" placeholder="e.g. Portia"></div>
+        </div>
+        <div class="field">
+          <label for="f-text">Text</label>
+          <textarea id="f-text" spellcheck="false" placeholder="Paste your monologue or scene here. Each line becomes one beat to recall.">${esc(p.text || "")}</textarea>
+        </div>
+        <p class="howto">Each line is one beat to recall, so break long prose into phrases. For a scene, start each speech with the speaker in capitals, like <code>PORTIA: The quality of mercy is not strain'd</code>. Lines spoken by other characters stay visible as your cues. Put stage directions in brackets, like <code>[Exit]</code>.</p>
+        <p class="err" id="f-err" hidden></p>
+        <div class="row">
+          <button class="btn primary" type="submit">${isNew ? "Add to repertoire" : "Save changes"}</button>
+          <button class="btn" type="button" id="cancel">Cancel</button>
+        </div>
+      </form>`;
+    $("#f-title").focus();
+  }
+
+  // ---------- events ----------
+  $("#rep").addEventListener("click", e => {
+    const b = e.target.closest("button[data-id]"); if (!b) return;
+    if (b.dataset.id !== activeId || view !== "practice") { activeId = b.dataset.id; view = "practice"; confirmDel = null; render(); }
+  });
+  $("#new-piece").addEventListener("click", () => { view = "new"; confirmDel = null; render(); });
+
+  $("#main").addEventListener("click", e => {
+    const t = e.target.closest("button, .ln.mine");
+    if (!t) return;
+    if (t.matches(".ln.mine")) { jumpTo(+t.dataset.unit); return; }
+    const id = t.id;
+    if (t.dataset.mode) {
+      mode = t.dataset.mode;
+      try { localStorage.setItem(MODE_KEY, mode); } catch {}
+      document.querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === mode));
+      renderStage(); return;
+    }
+    if (t.dataset.delEntry !== undefined) {
+      const key = t.dataset.key;
+      if (confirmDel !== key) { confirmDel = key; renderLog(active()); return; }
+      const p = JSON.parse(JSON.stringify(active()));
+      p.sessions.splice(+t.dataset.delEntry, 1);
+      confirmDel = null; persist(p); render(); toast("Log entry deleted."); return;
+    }
+    if (id !== "del") confirmDel = null;
+    switch (id) {
+      case "call": lineCall(); break;
+      case "show": showLine(); break;
+      case "got": gotIt(); break;
+      case "back": back(); break;
+      case "restart": restart(); break;
+      case "end": endEarly(); break;
+      case "again": restart(); break;
+      case "save-notes": saveSession($("#notes").value); break;
+      case "edit": view = "edit"; render(); break;
+      case "cancel": view = "practice"; render(); break;
+      case "dup": {
+        const p = { ...JSON.parse(JSON.stringify(SAMPLE)), id: newId(), created: Date.now(), updated: Date.now() };
+        delete p.example; activeId = p.id; persist(p); sess = null; render(); toast("Added to your repertoire."); break;
+      }
+      case "del": {
+        const p = active();
+        if (confirmDel !== p.id) { confirmDel = p.id; renderPractice(); break; }
+        confirmDel = null; removePiece(p.id); activeId = null; sess = null; render(); toast("Piece deleted."); break;
+      }
+    }
+  });
+
+  $("#main").addEventListener("submit", e => {
+    e.preventDefault();
+    const title = $("#f-title").value.trim(), text = $("#f-text").value.replace(/\s+$/, "");
+    const err = $("#f-err");
+    if (!title || !text.trim()) { err.textContent = !title ? "Give the piece a title so you can find it in your repertoire." : "Paste the text you want to learn."; err.hidden = false; return; }
+    const base = view === "new" || active().example ? { id: newId(), created: Date.now(), sessions: [] } : JSON.parse(JSON.stringify(active()));
+    if (view !== "new" && active().example) base.sessions = [];
+    Object.assign(base, { title, source: $("#f-source").value.trim(), character: $("#f-char").value.trim(), text, updated: Date.now() });
+    delete base.example;
+    persist(base);
+    activeId = base.id; view = "practice"; sess = null;
+    render();
+    toast("Saved.");
+  });
+
+  $("#edit-heading").addEventListener("click", openHeadingEditor);
+  $("#h-cancel").addEventListener("click", closeHeadingEditor);
+  $("#h-reset").addEventListener("click", () => { $("#h-title").value = heading.title; $("#h-tag").value = heading.tagline; $("#h-title").focus(); });
+  $("#brand-edit").addEventListener("submit", e => {
+    e.preventDefault();
+    const next = { title: $("#h-title").value.trim(), tagline: $("#h-tag").value.trim() };
+    if (!next.title) { toast("Give the site a title before publishing."); $("#h-title").focus(); return; }
+    if (next.title === heading.title && next.tagline === heading.tagline) { closeHeadingEditor(); toast("Nothing changed."); return; }
+    publishHeading(next);
+  });
+
+  // Typing "theatre" anywhere outside a text field toggles the heading editor (owner/editors only).
+  document.addEventListener("keydown", e => {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.key.length !== 1) return;
+    if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
+    typed = (typed + e.key.toLowerCase()).slice(-7);
+    if (typed === "theatre" && canEditHeading) { typed = ""; toggleDevMode(); }
+  });
+
+  document.addEventListener("keydown", e => {
+    if (view !== "practice" || !sess || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
+    if (e.target.closest && e.target.closest("button") && (e.key === " " || e.key === "Enter")) return;
+    const k = e.key.toLowerCase();
+    if (k === " " || k === "enter") { e.preventDefault(); gotIt(); }
+    else if (k === "l") { e.preventDefault(); lineCall(); }
+    else if (k === "s") { e.preventDefault(); showLine(); }
+    else if (k === "arrowleft" || k === "backspace") { e.preventDefault(); back(); }
+  });
+
+  applyHeading();
+  render();
+  connect();
+  try { const f = sessionStorage.getItem("promptbook.flash"); if (f) { sessionStorage.removeItem("promptbook.flash"); toast(f); } } catch {}
+})();
+</script>
+</body></html>
